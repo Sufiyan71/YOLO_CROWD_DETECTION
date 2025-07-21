@@ -1,0 +1,88 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crowd Density Analysis</title>
+    <style>
+        body { font-family: sans-serif; background-color: #2c3e50; color: #ecf0f1; margin: 0; padding: 20px; }
+        .container { max-width: 1400px; margin: auto; }
+        h1 { text-align: center; color: #3498db; }
+        .video-container { 
+            border: 2px solid #34495e; 
+            background-color: #000;
+            margin-bottom: 20px;
+        }
+        img { width: 100%; height: auto; display: block; }
+        .controls { text-align: center; margin-bottom: 20px; }
+        .btn {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover { background-color: #2980b9; }
+        .btn-save { background-color: #2ecc71; }
+        .btn-save:hover { background-color: #27ae60; }
+        .status { margin-top: 10px; font-size: 1em; color: #e67e22; height: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Crowd Density Analysis Stream</h1>
+
+    <div class="controls">
+        <button id="editBtn" class="btn">Toggle ROI Edit Mode</button>
+        <button id="saveBtn" class="btn btn-save">Save ROIs</button>
+        <div id="statusMessage" class="status"></div>
+    </div>
+
+    <div class="video-container">
+        <img src="/video_feed" alt="Video Stream">
+    </div>
+</div>
+
+<script>
+    const editBtn = document.getElementById('editBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const statusMessage = document.getElementById('statusMessage');
+
+    async function postRequest(url) {
+        try {
+            const response = await fetch(url, { method: 'POST' });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Fetch error:', error);
+            statusMessage.textContent = 'Error: Could not connect to server.';
+            return null;
+        }
+    }
+
+    editBtn.addEventListener('click', async () => {
+        const data = await postRequest('/toggle_edit_mode');
+        if (data) {
+            const mode = data.edit_mode ? 'ON' : 'OFF';
+            statusMessage.textContent = `ROI Edit Mode is now ${mode}. Please draw in the original OpenCV window if available, then click Save.`;
+        }
+    });
+
+    saveBtn.addEventListener('click', async () => {
+        const data = await postRequest('/save_rois');
+        if (data && data.status === 'success') {
+            statusMessage.textContent = 'ROIs have been saved successfully!';
+        } else if (data) {
+            statusMessage.textContent = `Error saving ROIs: ${data.message}`;
+        }
+    });
+</script>
+
+</body>
+</html>

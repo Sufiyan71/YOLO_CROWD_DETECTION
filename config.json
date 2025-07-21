@@ -1,0 +1,12 @@
+{
+  "cam_id": 5,
+  "location_name": "Mahadwar Chowk",
+  "source": "rtsp://admin:Admin123@172.16.0.48:554/ch1/stream1",
+  "email_recipients": [
+    "shardul7x1@gmail.com",
+    "sachin.m@moodscope.in",
+    "deshmukhb92@gmail.com",
+    "rahulmehere.23@gmail.com",
+    "mohammadsufiyansheikh@gmail.com"
+  ]
+}
